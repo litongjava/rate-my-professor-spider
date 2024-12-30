@@ -1,0 +1,70 @@
+query GetSchoolDetailsById($schoolID: ID!) {
+  school: node(id: $schoolID) {
+    __typename
+    ... on School {
+      id
+      legacyId
+      name
+      city
+      state
+      country
+      avgRatingRounded
+      numRatings
+      departments {
+        id
+        name
+      }
+      summary {
+        campusCondition
+        campusLocation
+        careerOpportunities
+        clubAndEventActivities
+        foodQuality
+        internetSpeed
+        libraryCondition
+        schoolReputation
+        schoolSafety
+        schoolSatisfaction
+        socialActivities
+      }
+      ratings {
+        edges {
+          cursor
+          node {
+            clubsRating
+            comment
+            createdByUser
+            date
+            facilitiesRating
+            flagStatus
+            foodRating
+            happinessRating
+            id
+            internetRating
+            legacyId
+            locationRating
+            opportunitiesRating
+            reputationRating
+            safetyRating
+            socialRating
+            thumbsDownTotal
+            thumbsUpTotal
+            userThumbs {
+              campusRatingId
+              computerId
+              id
+              legacyId
+              thumbsDown
+              thumbsUp
+              userId
+            }
+          }
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+      }
+    }
+  }
+}

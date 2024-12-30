@@ -1,0 +1,84 @@
+--# graphql.TeacherSearch
+query TeacherSearch($query: TeacherSearchQuery!) {
+  search: newSearch {
+    teachers(query: $query, first: 1) {
+      edges {
+        node {
+          id
+          firstName
+          lastName
+          department
+          departmentId
+          avgDifficultyRounded
+          avgRatingRounded
+          courseCodes {
+            courseName
+            courseCount
+          }
+          mostUsefulRating {
+            comment
+            ratingTags
+            wouldTakeAgain
+          }
+          numRatings
+          ratings {
+            edges {
+              node {
+                id
+                adminReviewedAt
+                attendanceMandatory
+                clarityRatingRounded
+                class
+                courseType
+                comment
+                createdByUser
+                date
+                difficultyRatingRounded
+                flagStatus
+                grade
+                helpfulRatingRounded
+                iWouldTakeAgain
+                isForCredit
+                isForOnlineClass
+                qualityRating
+                ratingTags
+                teacherNote{
+                  id
+                  class
+                  comment
+                  createDate
+                  createdAt
+                  flagStatus
+                  ratingId
+                  updateDate
+                  updatedAt
+                }
+                textbookIsUsed
+                thumbsUpTotal
+                thumbsDownTotal
+                userThumbs{
+                  id
+                  ratingId
+                  computerId
+                  thumbsDown
+                  thumbsUp
+                  userId
+                }
+              }
+            }
+          }
+          school {
+            id
+            name
+          }
+          teacherRatingTags {
+            id
+            tagName
+          }
+          wouldTakeAgainCount
+          wouldTakeAgainPercentRounded
+        }
+      }
+    }
+  }
+}

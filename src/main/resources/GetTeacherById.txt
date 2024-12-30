@@ -1,0 +1,76 @@
+query GetTeacherById($id: ID!) {
+    teacher: node(id: $id) {
+        __typename
+        ... on Teacher {
+            ...TeacherCard_teacher
+        }
+    }
+}
+
+fragment TeacherCard_teacher on Teacher {
+    id
+    firstName
+    lastName
+    department
+    departmentId
+    avgDifficultyRounded
+    avgRatingRounded
+    wouldTakeAgainCount
+    wouldTakeAgainPercentRounded
+    numRatings
+    school {
+        id
+    }
+
+    courseCodes {
+        courseName
+        courseCount
+    }
+
+    teacherRatingTags {
+        id
+        tagName
+        tagCount
+    }
+    mostUsefulRating {
+        id
+    }
+
+    ratings {
+        edges {
+            node {
+                id
+                adminReviewedAt
+                attendanceMandatory
+                clarityRatingRounded
+                class
+                courseType
+                comment
+                createdByUser
+                date
+                difficultyRatingRounded
+                flagStatus
+                grade
+                helpfulRatingRounded
+                wouldTakeAgain
+                isForCredit
+                isForOnlineClass
+        legacyId
+        maskCount
+                qualityRating
+                ratingTags
+                textbookIsUsed
+                thumbsUpTotal
+                thumbsDownTotal
+                userThumbs {
+                    id
+                    ratingId
+                    computerId
+                    thumbsDown
+                    thumbsUp
+                    userId
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,8 @@
+[win.build]
+mvn clean package -DskipTests -Pproduction
+
+[linux.build]
+mvn clean package -DskipTests -Pproduction
+
+[mac.build]
+mvn clean package -DskipTests -Pproduction

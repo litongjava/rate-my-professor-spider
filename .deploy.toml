@@ -1,0 +1,28 @@
+[dev.upload-run]
+url = "http://192.168.1.2:10405/deploy/file/upload-run/"
+p = "123456"
+b = ".build.txt"
+z = "app.zip target/rate-my-professor-spider-1.0.0.jar"
+file = "app.zip"
+d = "unzip/rate-my-professor-spider"
+c1 = "mkdir -p /data/apps/rate-my-professor-spider"
+c2 = "[ -d /data/apps/rate-my-professor-spider ] && cp -r /data/apps/rate-my-professor-spider backup/rate-my-professor-spider-backup-$(date +'%Y%m%d_%H%M%S')"
+c3 = "cp unzip/rate-my-professor-spider/target/rate-my-professor-spider-1.0.0.jar /data/apps/rate-my-professor-spider/"
+c4 = "docker rm -f rate-my-professor-spider 2>/dev/null || true"
+c5 = "cd /data/apps/rate-my-professor-spider && docker run -dit --name rate-my-professor-spider --restart=always --net=host -v $(pwd):/app -w /app -e TZ=Asia/Shanghai -e LANG=C.UTF-8 litongjava/jdk:17.0.12-stable-slim java -jar rate-my-professor-spider-1.0.0.jar"
+c = "docker ps | grep rate-my-professor-spider"
+
+
+[test.upload-run]
+url = "http://52.9.164.136:10405/deploy/file/upload-run/"
+p = "123456"
+b = ".build.txt"
+z = "app.zip target/rate-my-professor-spider-1.0.0.jar"
+file = "app.zip"
+d = "unzip/rate-my-professor-spider"
+c1 = "mkdir -p /data/apps/rate-my-professor-spider"
+c2 = "[ -d /data/apps/rate-my-professor-spider ] && cp -r /data/apps/rate-my-professor-spider backup/rate-my-professor-spider-backup-$(date +'%Y%m%d_%H%M%S')"
+c3 = "cp unzip/rate-my-professor-spider/target/rate-my-professor-spider-1.0.0.jar /data/apps/rate-my-professor-spider/"
+c4 = "docker rm -f rate-my-professor-spider 2>/dev/null || true"
+c5 = "cd /data/apps/rate-my-professor-spider && docker run -dit --name rate-my-professor-spider --restart=always --net=host -v $(pwd):/app -w /app -e TZ=Asia/Shanghai -e LANG=C.UTF-8 litongjava/jdk:17.0.12-stable-slim java -jar rate-my-professor-spider-1.0.0.jar --app.env=test"
+c = "docker ps | grep rate-my-professor-spider"
