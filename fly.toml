@@ -1,0 +1,21 @@
+app = "rate-my-professor-spider"
+primary_region = 'sjc'
+
+kill_signal = "SIGINT"
+kill_timeout = 5
+processes = []
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "2048MB"
+
+[http_service]
+  internal_port = 81
+  force_https = false
+  auto_stop_machines = false
+  auto_start_machines = false
+  min_machines_running = 1
+
+
+[env]
+  LANG="C.UTF-8"

@@ -15,14 +15,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RmpProfessorService {
   public void saveOrUpdate(Long teacherId, Row professor, String sourceUrl) {
-    boolean exists = Db.exists(TableNames.rmp_professor, "id", teacherId);
+    boolean exists = Db.exists(TableNames.rumi_rmp_professor, "id", teacherId);
     if (exists) {
-      log.info("update table:{},{}", TableNames.rmp_professor, teacherId);
-      Db.update(TableNames.rmp_professor, "id", professor);
+      log.info("update table:{},{}", TableNames.rumi_rmp_professor, teacherId);
+      Db.update(TableNames.rumi_rmp_professor, "id", professor);
 
     } else {
-      log.info("insert table:{},{}", TableNames.rmp_professor, teacherId);
-      Db.save(TableNames.rmp_professor, professor);
+      log.info("insert table:{},{}", TableNames.rumi_rmp_professor, teacherId);
+      Db.save(TableNames.rumi_rmp_professor, professor);
     }
   }
 
@@ -54,6 +54,7 @@ public class RmpProfessorService {
     jsonObject = jsonObject.getJSONObject("data").getJSONObject("teacher");
     if (jsonObject == null) {
       log.info("please check:{}", sourceUrl);
+      Db.save(TableNames.rumi_rmp_professor_not_found_id, Row.by("id", id));
       return;
     }
     JSONObject school = jsonObject.getJSONObject("school");

@@ -3,7 +3,7 @@ package com.litongjava.spider.rmp.constants;
 public interface TableNames {
   String rumi_embedding = "rumi_embedding";
 
-  String rmp_professor = "rmp_professor";
+  String rumi_rmp_professor = "rumi_rmp_professor";
   String rumi_rmp_rating = "rumi_rmp_rating";
   String rumi_rmp_professor_rating_tag = "rumi_rmp_professor_rating_tag";
 
@@ -16,5 +16,6 @@ public interface TableNames {
   String rumi_rmp_professor_rating_tag_mapping = "rumi_rmp_professor_rating_tag_mapping";
 
   String rumi_rmp_professor_rating_thumb = "rumi_rmp_professor_rating_thumb";
+  String rumi_rmp_professor_not_found_id = "rumi_rmp_professor_not_found_id";
 
 }

@@ -2,8 +2,10 @@ package com.litongjava.spider.rmp.services;
 
 import java.io.IOException;
 
+import com.litongjava.db.activerecord.Db;
 import com.litongjava.jfinal.aop.Aop;
 import com.litongjava.spider.rmp.client.RMPGraphqlClient;
+import com.litongjava.spider.rmp.constants.TableNames;
 
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
@@ -18,8 +20,15 @@ public class RmpTeacherSpiderService {
     long i = 0;
     while (true) {
       i++;
-      try {
-        Response response = rmpGraphqlClient.getTeacherDetailsById(i);
+      log.info("fetch:{}", i);
+      if (Db.exists(TableNames.rumi_rmp_professor, "id", i)) {
+        continue;
+      }
+      if (Db.exists(TableNames.rumi_rmp_professor_not_found_id, "id", i)) {
+        continue;
+      }
+
+      try (Response response = rmpGraphqlClient.getTeacherDetailsById(i)) {
         try {
           Thread.sleep(1000);
         } catch (InterruptedException e1) {
@@ -34,12 +43,9 @@ public class RmpTeacherSpiderService {
           }
           notFoundCount = 0;
         } else {
-          log.error("Failed to fetch:{}", i);
+          log.error("Failed to fetch:{},code:{},body:{}", i, response.code(), response.body().toString());
           notFoundCount++;
-          if (notFoundCount > 3) {
-            break;
-          }
-          log.info("End to fetch:{}", i);
+          log.info("End to fetch:{} notFoundCount:{}", i, notFoundCount);
 
         }
 

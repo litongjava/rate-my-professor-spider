@@ -36,9 +36,9 @@ public class RMPVectorService {
   }
 
   public void embeddingProfessor() {
-    List<Row> records = Db.find("select id,first_name,last_name,name from " + TableNames.rmp_professor);
+    List<Row> records = Db.find("select id,first_name,last_name,name from " + TableNames.rumi_rmp_professor);
 
-    String updateSql = "update " + TableNames.rmp_professor + " set first_name_vector= ?,last_name_vector=?,name_vector=? where id=?";
+    String updateSql = "update " + TableNames.rumi_rmp_professor + " set first_name_vector= ?,last_name_vector=?,name_vector=? where id=?";
 
     for (Row record : records) {
       String firstName = record.getStr("first_name");
