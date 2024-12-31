@@ -26,7 +26,7 @@ public class RmpProfessorService {
     }
   }
 
-  private void save(String sourceUrl, Long id, Long mostUsefulRatingId, JSONObject jsonObject) {
+  private void save(String sourceUrl, Long id, Long schoolId, Long mostUsefulRatingId, JSONObject jsonObject) {
     String firstName = jsonObject.getString("firstName");
     String lastName = jsonObject.getString("lastName");
     String name = firstName + " " + lastName;
@@ -37,6 +37,7 @@ public class RmpProfessorService {
     m.setName(name);
     m.setMostUsefulRatingId(mostUsefulRatingId);
     m.setSourceUrl(sourceUrl);
+    m.setSchoolId(schoolId);
 
     Db.tx(() -> {
       Db.deleteById(RumiRmpProfessor.tableName, id);
@@ -59,10 +60,11 @@ public class RmpProfessorService {
     }
     JSONObject school = jsonObject.getJSONObject("school");
     jsonObject.remove("school");
+    Long schoolId = null;
     if (school != null) {
       String idString = school.getString("id");
       String idLongString = Base64Utils.decodeToString(idString).split("-")[1];
-      Long schoolId = Long.valueOf(idLongString);
+      schoolId = Long.valueOf(idLongString);
       rmpSchoolSpiderService.fetchAndSaveIfNotExists(schoolId);
     }
 
@@ -86,7 +88,7 @@ public class RmpProfessorService {
       String[] split = idString.split("-");
       mostUsefulRatingId = Long.valueOf(split[1]);
     }
-    save(sourceUrl, id, mostUsefulRatingId, jsonObject);
+    save(sourceUrl, id, schoolId, mostUsefulRatingId, jsonObject);
 
   }
 
