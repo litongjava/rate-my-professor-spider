@@ -16,4 +16,11 @@ public class SpiderController {
     return RespBodyVo.ok();
   }
 
+  public RespBodyVo professorsBySchoolId(Long schoolId) {
+    TioThreadUtils.submit(() -> {
+      Aop.get(RmpTeacherSpiderService.class).professorsBySchoolId(schoolId);
+    });
+    return RespBodyVo.ok();
+  }
+
 }

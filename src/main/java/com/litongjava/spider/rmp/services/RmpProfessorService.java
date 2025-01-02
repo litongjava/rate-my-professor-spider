@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class RmpProfessorService {
+  RmpSchoolSpiderService rmpSchoolSpiderService = Aop.get(RmpSchoolSpiderService.class);
+
   public void saveOrUpdate(Long teacherId, Row professor, String sourceUrl) {
     boolean exists = Db.exists(TableNames.rumi_rmp_professor, "id", teacherId);
     if (exists) {
@@ -48,22 +50,31 @@ public class RmpProfessorService {
   }
 
   public void saveProfessorDetail(Long id, String jsonString) {
-    RmpSchoolSpiderService rmpSchoolSpiderService = Aop.get(RmpSchoolSpiderService.class);
 
-    String sourceUrl = "https://www.ratemyprofessors.com/professor/" + id;
     JSONObject jsonObject = FastJson2Utils.parseObject(jsonString);
     jsonObject = jsonObject.getJSONObject("data").getJSONObject("teacher");
     if (jsonObject == null) {
-      log.info("please check:{}", sourceUrl);
       Db.save(TableNames.rumi_rmp_professor_not_found_id, Row.by("id", id));
       return;
     }
+
+    saveProfessorDetail(jsonObject);
+
+  }
+
+  public void saveProfessorDetail(JSONObject jsonObject) {
+    Long id;
+    String idString = jsonObject.getString("id");
+
+    id = Long.valueOf(Base64Utils.decodeToString(idString).split("-")[1]);
+    String sourceUrl = "https://www.ratemyprofessors.com/professor/" + id;
+
     JSONObject school = jsonObject.getJSONObject("school");
     jsonObject.remove("school");
     Long schoolId = null;
     if (school != null) {
-      String idString = school.getString("id");
-      String idLongString = Base64Utils.decodeToString(idString).split("-")[1];
+      String schoolIdString = school.getString("id");
+      String idLongString = Base64Utils.decodeToString(schoolIdString).split("-")[1];
       schoolId = Long.valueOf(idLongString);
       rmpSchoolSpiderService.fetchAndSaveIfNotExists(schoolId);
     }
@@ -84,12 +95,10 @@ public class RmpProfessorService {
     jsonObject.remove("mostUsefulRating");
     Long mostUsefulRatingId = null;
     if (mostUsefulRating != null) {
-      String idString = Base64Utils.decodeToString(mostUsefulRating.getString("id"));
-      String[] split = idString.split("-");
+      String[] split = Base64Utils.decodeToString(mostUsefulRating.getString("id")).split("-");
       mostUsefulRatingId = Long.valueOf(split[1]);
     }
     save(sourceUrl, id, schoolId, mostUsefulRatingId, jsonObject);
-
   }
 
 }
