@@ -1,0 +1,26 @@
+query CountTeacherBySchool(
+  $count: Int!
+  $cursor: String
+  $query: TeacherSearchQuery!
+) {
+  search: newSearch {
+    ...TeacherSearchPagination_search_1jWD3d
+  }
+}
+
+fragment TeacherSearchPagination_search_1jWD3d on newSearch {
+  teachers(query: $query, first: $count, after: $cursor) {
+    didFallback
+    edges {
+      cursor
+      node {
+        id
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    resultCount
+  }
+}

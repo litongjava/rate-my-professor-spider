@@ -1,0 +1,96 @@
+query TeacherSearchPaginationQueryBySchool(
+  $count: Int!
+  $cursor: String
+  $query: TeacherSearchQuery!
+) {
+  search: newSearch {
+    ...TeacherSearchPagination_search_1jWD3d
+  }
+}
+
+fragment TeacherSearchPagination_search_1jWD3d on newSearch {
+  teachers(query: $query, first: $count, after: $cursor) {
+    didFallback
+    edges {
+      cursor
+      node {
+        ...TeacherCard_teacher
+        id
+        __typename
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    resultCount
+  }
+}
+
+fragment TeacherCard_teacher on Teacher {
+    id
+    firstName
+    lastName
+    department
+    departmentId
+    avgDifficultyRounded
+    avgRatingRounded
+    wouldTakeAgainCount
+    wouldTakeAgainPercentRounded
+    numRatings
+    school {
+        id
+    }
+
+    courseCodes {
+        courseName
+        courseCount
+    }
+
+    teacherRatingTags {
+        id
+        tagName
+        tagCount
+    }
+    mostUsefulRating {
+        id
+    }
+
+    ratings {
+        edges {
+            node {
+                id
+                adminReviewedAt
+                attendanceMandatory
+                clarityRatingRounded
+                class
+                courseType
+                comment
+                createdByUser
+                date
+                difficultyRatingRounded
+                flagStatus
+                grade
+                helpfulRatingRounded
+                wouldTakeAgain
+                isForCredit
+                isForOnlineClass
+        legacyId
+        maskCount
+                qualityRating
+                ratingTags
+                textbookIsUsed
+                thumbsUpTotal
+                thumbsDownTotal
+                userThumbs {
+                    id
+                    ratingId
+                    computerId
+                    thumbsDown
+                    thumbsUp
+                    userId
+                }
+            }
+        }
+    }
+}

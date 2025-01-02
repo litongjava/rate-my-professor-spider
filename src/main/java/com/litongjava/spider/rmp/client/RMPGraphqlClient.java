@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.litongjava.tio.utils.encoder.Base64Utils;
 import com.litongjava.tio.utils.http.OkHttpClientPool;
 import com.litongjava.tio.utils.hutool.FileUtil;
@@ -113,5 +114,81 @@ public class RMPGraphqlClient {
     Request request = new Request.Builder().url(serverUrl).method("POST", body).addHeader("Authorization", authorization).addHeader("User-Agent", userAgent)
         .addHeader("Content-Type", "application/json").build();
     return httpClient.newCall(request).execute();
+  }
+
+  public Response pageTeacherBySchoolId(Long schoolId, Integer cursorInt, Integer count) throws IOException {
+    String query = FileUtil.readURLAsString(ResourceUtil.getResource("TeacherSearchPaginationQueryBySchool.txt")).toString();
+
+    String base64SchoolId = Base64Utils.encodeToString("School-" + schoolId);
+
+    Map<String, Object> variablesQuery = new HashMap<>();
+    variablesQuery.put("text", "");
+    variablesQuery.put("schoolID", base64SchoolId);
+    variablesQuery.put("fallback", false);
+
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("query", variablesQuery);
+    variables.put("count", count);
+    if (cursorInt > 1) {
+      String base64cursor = Base64Utils.encodeToString("arrayconnection:" + cursorInt);
+      variables.put("cursor", base64cursor);
+    } else {
+      variables.put("cursor", "");
+    }
+
+    Map<String, Object> payloadMap = new HashMap<>();
+    payloadMap.put("query", query);
+    payloadMap.put("variables", variables);
+
+    String payload = FastJson2Utils.toJson(payloadMap);
+
+    OkHttpClient httpClient = OkHttpClientPool.getHttpClient();
+
+    MediaType mediaType = MediaType.parse("application/json");
+    @SuppressWarnings("deprecation")
+    RequestBody body = RequestBody.create(mediaType, payload);
+
+    // request
+    Request request = new Request.Builder().url(serverUrl).method("POST", body).addHeader("Authorization", authorization).addHeader("User-Agent", userAgent)
+        .addHeader("Content-Type", "application/json").build();
+    return httpClient.newCall(request).execute();
+
+  }
+
+  public Integer countTeacherBySchool(Long schoolId) throws IOException {
+    String query = FileUtil.readURLAsString(ResourceUtil.getResource("CounTeacherBySchool.txt")).toString();
+
+    String base64SchoolId = Base64Utils.encodeToString("School-" + schoolId);
+
+    Map<String, Object> variablesQuery = new HashMap<>();
+    variablesQuery.put("text", "");
+    variablesQuery.put("schoolID", base64SchoolId);
+    variablesQuery.put("fallback", false);
+
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("query", variablesQuery);
+    variables.put("count", 1);
+    variables.put("cursor", "");
+
+    Map<String, Object> payloadMap = new HashMap<>();
+    payloadMap.put("query", query);
+    payloadMap.put("variables", variables);
+
+    String payload = FastJson2Utils.toJson(payloadMap);
+
+    OkHttpClient httpClient = OkHttpClientPool.getHttpClient();
+
+    MediaType mediaType = MediaType.parse("application/json");
+    @SuppressWarnings("deprecation")
+    RequestBody body = RequestBody.create(mediaType, payload);
+
+    // request
+    Request request = new Request.Builder().url(serverUrl).method("POST", body).addHeader("Authorization", authorization).addHeader("User-Agent", userAgent)
+        .addHeader("Content-Type", "application/json").build();
+    try (Response response = httpClient.newCall(request).execute()) {
+      String string = response.body().string();
+      JSONObject jsonObject = FastJson2Utils.parseObject(string);
+      return jsonObject.getJSONObject("data").getJSONObject("search").getJSONObject("teachers").getInteger("resultCount");
+    }
   }
 }
