@@ -61,6 +61,7 @@ public class RmpTeacherSpiderService {
   }
 
   public void professorsBySchoolId(Long schoolId) {
+    long start = System.currentTimeMillis();
     RMPGraphqlClient rmpGraphqlClient = Aop.get(RMPGraphqlClient.class);
     Integer count = 0;
     try {
@@ -78,10 +79,10 @@ public class RmpTeacherSpiderService {
         } catch (InterruptedException e) {
           e.printStackTrace();
         }
-        long start = System.currentTimeMillis();
+        long start1 = System.currentTimeMillis();
         try (Response response = rmpGraphqlClient.pageTeacherBySchoolId(schoolId, i - 1, pageSize)) {
           long end = System.currentTimeMillis();
-          String msg = "fetch " + schoolId + " " + i + " elapsed " + (end - start);
+          String msg = "fetch " + schoolId + " " + i + " elapsed " + (end - start1);
           log.info(msg);
           TelegramNotificaitonUtils.pushtoAdmin(msg);
           String string = response.body().string();
@@ -91,7 +92,10 @@ public class RmpTeacherSpiderService {
         }
       }
     }
-
+    long end = System.currentTimeMillis();
+    String msg = "finish " + schoolId + " " + count + " elapsed " + (end - start);
+    TelegramNotificaitonUtils.pushtoAdmin(msg);
+    log.info(msg);
   }
 
   public void save(String string) {
