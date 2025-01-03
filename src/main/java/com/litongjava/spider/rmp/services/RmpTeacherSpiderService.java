@@ -8,6 +8,7 @@ import com.litongjava.db.activerecord.Db;
 import com.litongjava.jfinal.aop.Aop;
 import com.litongjava.spider.rmp.client.RMPGraphqlClient;
 import com.litongjava.spider.rmp.constants.TableNames;
+import com.litongjava.spider.rmp.utils.TelegramNotificaitonUtils;
 import com.litongjava.tio.utils.json.FastJson2Utils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -80,7 +81,9 @@ public class RmpTeacherSpiderService {
         long start = System.currentTimeMillis();
         try (Response response = rmpGraphqlClient.pageTeacherBySchoolId(schoolId, i - 1, pageSize)) {
           long end = System.currentTimeMillis();
-          log.info("fetch {} {} elapsed {}", schoolId, i, end - start);
+          String msg = "fetch " + schoolId + " " + i + " elapsed " + (end - start);
+          log.info(msg);
+          TelegramNotificaitonUtils.pushtoAdmin(msg);
           String string = response.body().string();
           save(string);
         } catch (Exception e) {
