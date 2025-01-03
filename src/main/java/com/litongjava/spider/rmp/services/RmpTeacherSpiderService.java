@@ -64,7 +64,7 @@ public class RmpTeacherSpiderService {
     Integer count = 0;
     try {
       count = rmpGraphqlClient.countTeacherBySchool(881L);
-      System.out.println(count);
+      log.info("count:{}", 4732);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -73,22 +73,18 @@ public class RmpTeacherSpiderService {
     if (count > 0) {
       for (int i = 0; i < count; i += pageSize) {
         try {
-          try {
-            Thread.sleep(1000);
-          } catch (InterruptedException e) {
-            e.printStackTrace();
-          }
-
-          Response response = rmpGraphqlClient.pageTeacherBySchoolId(schoolId, i - 1, pageSize);
-          String string = response.body().string();
-          try {
-            save(string);
-          } catch (Exception e) {
-            log.error("Failed to save:" + i, e);
-          }
-
-        } catch (IOException e) {
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
           e.printStackTrace();
+        }
+        long start = System.currentTimeMillis();
+        try (Response response = rmpGraphqlClient.pageTeacherBySchoolId(schoolId, i - 1, pageSize)) {
+          long end = System.currentTimeMillis();
+          log.info("fetch {} {} elapsed {}", schoolId, i, end - start);
+          String string = response.body().string();
+          save(string);
+        } catch (Exception e) {
+          log.error("Failed to save:" + i, e);
         }
       }
     }
