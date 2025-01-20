@@ -4,6 +4,7 @@ import com.litongjava.annotation.RequestPath;
 import com.litongjava.jfinal.aop.Aop;
 import com.litongjava.model.body.RespBodyVo;
 import com.litongjava.spider.rmp.services.RmpTeacherSpiderService;
+import com.litongjava.spider.rmp.utils.TelegramNotificaitonUtils;
 import com.litongjava.tio.utils.thread.TioThreadUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,11 @@ public class SpiderController {
       }
 
     });
+    return RespBodyVo.ok();
+  }
+
+  public RespBodyVo push(String text) {
+    TelegramNotificaitonUtils.pushToAdmin(text);
     return RespBodyVo.ok();
   }
 

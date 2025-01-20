@@ -1,6 +1,7 @@
 package com.litongjava.spider.rmp.services;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
@@ -10,6 +11,7 @@ import com.litongjava.spider.rmp.client.RMPGraphqlClient;
 import com.litongjava.spider.rmp.constants.TableNames;
 import com.litongjava.spider.rmp.utils.TelegramNotificaitonUtils;
 import com.litongjava.tio.utils.json.FastJson2Utils;
+import com.litongjava.tio.utils.thread.TioThreadUtils;
 
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
@@ -17,12 +19,12 @@ import okhttp3.Response;
 @Slf4j
 public class RmpTeacherSpiderService {
   RmpProfessorService service = Aop.get(RmpProfessorService.class);
+  private AtomicInteger notFoundCount = new AtomicInteger(0);
 
   public void spiderAllTeacher() {
     RMPGraphqlClient rmpGraphqlClient = Aop.get(RMPGraphqlClient.class);
     RmpProfessorService service = Aop.get(RmpProfessorService.class);
-    int notFoundCount = 0;
-    long i = 0;
+    long i = 858242;
     while (true) {
       i++;
       log.info("fetch:{}", i);
@@ -33,30 +35,34 @@ public class RmpTeacherSpiderService {
         continue;
       }
 
-      try (Response response = rmpGraphqlClient.getTeacherDetailsById(i)) {
+      long j = i;
+      TioThreadUtils.execute(() -> {
+        fetchAndSave(rmpGraphqlClient, service, j);
+      });
+    }
+  }
+
+  private void fetchAndSave(RMPGraphqlClient rmpGraphqlClient, RmpProfessorService service, long i) {
+    try (Response response = rmpGraphqlClient.getTeacherDetailsById(i)) {
+      if (response.isSuccessful()) {
+        String string = response.body().string();
         try {
-          Thread.sleep(1000);
-        } catch (InterruptedException e1) {
-          e1.printStackTrace();
+          service.saveProfessorDetail(i, string);
+          log.info("save successful:{}", i);
+        } catch (Exception e) {
+          log.error("Failed to save:{}", i, e);
         }
-        if (response.isSuccessful()) {
-          String string = response.body().string();
-          try {
-            service.saveProfessorDetail(i, string);
-          } catch (Exception e) {
-            log.error("Failed to save:{}", i, e);
-          }
-          notFoundCount = 0;
-        } else {
-          log.error("Failed to fetch:{},code:{},body:{}", i, response.code(), response.body().toString());
-          notFoundCount++;
-          log.info("End to fetch:{} notFoundCount:{}", i, notFoundCount);
-
+        notFoundCount.set(0);
+      } else {
+        log.error("Failed to fetch:{},code:{},body:{}", i, response.code(), response.body().toString());
+        int current = notFoundCount.incrementAndGet();
+        log.info("End to fetch:{} notFoundCount:{}", i, notFoundCount);
+        if (current > 30) {
+          return;
         }
-
-      } catch (IOException e) {
-        e.printStackTrace();
       }
+    } catch (IOException e) {
+      e.printStackTrace();
     }
   }
 
@@ -65,8 +71,8 @@ public class RmpTeacherSpiderService {
     RMPGraphqlClient rmpGraphqlClient = Aop.get(RMPGraphqlClient.class);
     Integer count = 0;
     try {
-      count = rmpGraphqlClient.countTeacherBySchool(881L);
-      log.info("count:{}", 4732);
+      count = rmpGraphqlClient.countTeacherBySchool(schoolId);
+      log.info("count:{}", count);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -84,18 +90,20 @@ public class RmpTeacherSpiderService {
           long end = System.currentTimeMillis();
           String msg = "fetch " + schoolId + " " + i + " elapsed " + (end - start1);
           log.info(msg);
-          TelegramNotificaitonUtils.pushtoAdmin(msg);
+          TelegramNotificaitonUtils.pushToAdmin(msg);
           String string = response.body().string();
           save(string);
         } catch (Exception e) {
           log.error("Failed to save:" + i, e);
+          TelegramNotificaitonUtils.pushToAdmin(e.getMessage());
         }
       }
+      long end = System.currentTimeMillis();
+      String msg = "finish " + schoolId + " " + count + " elapsed " + (end - start);
+      TelegramNotificaitonUtils.pushToAdmin(msg);
+      log.info(msg);
     }
-    long end = System.currentTimeMillis();
-    String msg = "finish " + schoolId + " " + count + " elapsed " + (end - start);
-    TelegramNotificaitonUtils.pushtoAdmin(msg);
-    log.info(msg);
+
   }
 
   public void save(String string) {
