@@ -8,6 +8,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.litongjava.db.activerecord.Db;
 import com.litongjava.jfinal.aop.Aop;
 import com.litongjava.spider.rmp.client.RMPGraphqlClient;
+import com.litongjava.spider.rmp.client.RMPGraphqlClientUtils;
 import com.litongjava.spider.rmp.constants.TableNames;
 import com.litongjava.spider.rmp.utils.TelegramNotificaitonUtils;
 import com.litongjava.tio.utils.json.FastJson2Utils;
@@ -22,7 +23,7 @@ public class RmpTeacherSpiderService {
   private AtomicInteger notFoundCount = new AtomicInteger(0);
 
   public void spiderAllTeacher() {
-    RMPGraphqlClient rmpGraphqlClient = Aop.get(RMPGraphqlClient.class);
+    
     RmpProfessorService service = Aop.get(RmpProfessorService.class);
     long i = 1213125;
     while (true) {
@@ -37,13 +38,13 @@ public class RmpTeacherSpiderService {
 
       long j = i;
       TioThreadUtils.execute(() -> {
-        fetchAndSave(rmpGraphqlClient, service, j);
+        fetchAndSave(service, j);
       });
     }
   }
 
-  private void fetchAndSave(RMPGraphqlClient rmpGraphqlClient, RmpProfessorService service, long i) {
-    try (Response response = rmpGraphqlClient.getTeacherDetailsById(i)) {
+  private void fetchAndSave(RmpProfessorService service, long i) {
+    try (Response response = RMPGraphqlClientUtils.getTeacherDetailsById(i)) {
       if (response.isSuccessful()) {
         String string = response.body().string();
         try {

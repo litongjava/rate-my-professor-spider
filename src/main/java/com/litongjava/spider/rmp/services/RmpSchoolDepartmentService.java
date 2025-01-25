@@ -2,14 +2,18 @@ package com.litongjava.spider.rmp.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.google.common.util.concurrent.Striped;
 import com.litongjava.db.activerecord.Db;
 import com.litongjava.spider.rmp.constants.TableNames;
 import com.litongjava.spider.rmp.model.RumiRmpSchoolDepartments;
 import com.litongjava.tio.utils.snowflake.SnowflakeIdUtils;
 
 public class RmpSchoolDepartmentService {
+
+  private static final Striped<Lock> LOCK_STRIPED = Striped.lock(64);
 
   public void save(Long schoolId, com.alibaba.fastjson2.JSONArray jsonArray) {
 
@@ -24,14 +28,19 @@ public class RmpSchoolDepartmentService {
       list.add(d);
     }
 
-    Db.tx(() -> {
-      String sql = "delete from %s where school_id=?";
-      sql = String.format(sql, TableNames.rumi_rmp_school_departments);
-      Db.delete(sql, schoolId);
-      Db.batchSave(list, 100);
-      return true;
-    });
+    Lock lock = LOCK_STRIPED.get(schoolId);
+    lock.lock();
 
+    try {
+      Db.tx(() -> {
+        String sql = "delete from %s where school_id=?";
+        sql = String.format(sql, TableNames.rumi_rmp_school_departments);
+        Db.delete(sql, schoolId);
+        Db.batchSave(list, 100);
+        return true;
+      });
+    } finally {
+      lock.unlock();
+    }
   }
-
 }

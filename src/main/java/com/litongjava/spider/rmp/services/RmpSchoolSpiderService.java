@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.litongjava.db.activerecord.Db;
 import com.litongjava.jfinal.aop.Aop;
 import com.litongjava.spider.rmp.client.RMPGraphqlClient;
+import com.litongjava.spider.rmp.client.RMPGraphqlClientUtils;
 import com.litongjava.spider.rmp.constants.TableNames;
 
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,6 @@ import okhttp3.Response;
 @Slf4j
 public class RmpSchoolSpiderService {
 
-  RMPGraphqlClient rmpGraphqlClient = Aop.get(RMPGraphqlClient.class);
   RmpSchoolService rmpSchoolService = Aop.get(RmpSchoolService.class);
 
   public void spiderAllSchool() {
@@ -28,7 +28,7 @@ public class RmpSchoolSpiderService {
   }
 
   private void fetchAndSave(Long i) throws IOException {
-    Response response = rmpGraphqlClient.getSchoolDetailsById(i);
+    Response response = RMPGraphqlClientUtils.getSchoolDetailsById(i);
     try {
       Thread.sleep(1000);
     } catch (InterruptedException e1) {
