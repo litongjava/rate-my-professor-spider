@@ -57,9 +57,8 @@ public class RmpProfessorService {
       Db.save(TableNames.rumi_rmp_professor_not_found_id, Row.by("id", id));
       return;
     }
-
     saveProfessorDetail(jsonObject);
-
+    log.info("save successful:{}", id);
   }
 
   public void saveProfessorDetail(JSONObject jsonObject) {

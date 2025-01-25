@@ -22,16 +22,7 @@ public class RMPGraphqlClient {
   private String authorization = "Basic dGVzdDp0ZXN0";
   private String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36";
 
-  /**
-   * 1.发送请求
-   * 2.解析数据
-   * 3.入库
-   * String name = "Andrew Carter";
-   * String base64SchoolId = "U2Nob29sLTg4MQ==";
-   * @return 
-   * @throws IOException 
-   */
-  public Response teacherSearch(String name, Long schoolId) throws IOException {
+  public Response teacherSearch(OkHttpClient client, String name, Long schoolId) throws IOException {
     String query = FileUtil.readURLAsString(ResourceUtil.getResource("query_teacher.txt")).toString();
 
     String base64SchoolId = Base64Utils.encodeToString("School-" + schoolId);
@@ -58,11 +49,23 @@ public class RMPGraphqlClient {
     // request
     Request request = new Request.Builder().url(serverUrl).method("POST", body).addHeader("Authorization", authorization).addHeader("User-Agent", userAgent)
         .addHeader("Content-Type", "application/json").build();
-    return MyHttpClient.httpClient.newCall(request).execute();
-
+    return client.newCall(request).execute();
   }
 
-  public Response getSchoolDetailsById(Long schoolId) throws IOException {
+  /**
+   * 1.发送请求
+   * 2.解析数据
+   * 3.入库
+   * String name = "Andrew Carter";
+   * String base64SchoolId = "U2Nob29sLTg4MQ==";
+   * @return 
+   * @throws IOException 
+   */
+  public Response teacherSearch(String name, Long schoolId) throws IOException {
+    return teacherSearch(OkHttpClientPool.get300HttpClient(), name, schoolId);
+  }
+
+  public Response getSchoolDetailsById(OkHttpClient client, Long schoolId) throws IOException {
     String query = FileUtil.readURLAsString(ResourceUtil.getResource("GetSchoolDetailsById.txt")).toString();
 
     String base64SchoolId = Base64Utils.encodeToString("School-" + schoolId);
@@ -76,8 +79,6 @@ public class RMPGraphqlClient {
 
     String payload = FastJson2Utils.toJson(payloadMap);
 
-    OkHttpClient httpClient = OkHttpClientPool.getHttpClient();
-
     MediaType mediaType = MediaType.parse("application/json");
     @SuppressWarnings("deprecation")
     RequestBody body = RequestBody.create(mediaType, payload);
@@ -90,10 +91,15 @@ public class RMPGraphqlClient {
         .addHeader("Content-Type", "application/json")
         //
         .build();
-    return httpClient.newCall(request).execute();
+    return client.newCall(request).execute();
   }
 
-  public Response getTeacherDetailsById(Long id) throws IOException {
+  public Response getSchoolDetailsById(Long schoolId) throws IOException {
+
+    return getSchoolDetailsById(OkHttpClientPool.get300HttpClient(), schoolId);
+  }
+
+  public Response getTeacherDetailsById(OkHttpClient client, Long id) throws IOException {
     String query = FileUtil.readURLAsString(ResourceUtil.getResource("GetTeacherById.txt")).toString();
 
     String base64SchoolId = Base64Utils.encodeToString("Teacher-" + id);
@@ -107,7 +113,6 @@ public class RMPGraphqlClient {
 
     String payload = FastJson2Utils.toJson(payloadMap);
 
-
     MediaType mediaType = MediaType.parse("application/json");
     @SuppressWarnings("deprecation")
     RequestBody body = RequestBody.create(mediaType, payload);
@@ -118,10 +123,14 @@ public class RMPGraphqlClient {
         .addHeader("Authorization", authorization).addHeader("User-Agent", userAgent)
         //
         .addHeader("Content-Type", "application/json").build();
-    return MyHttpClient.httpClient.newCall(request).execute();
+    return client.newCall(request).execute();
   }
 
-  public Response pageTeacherBySchoolId(Long schoolId, Integer cursorInt, Integer count) throws IOException {
+  public Response getTeacherDetailsById(Long id) throws IOException {
+    return getTeacherDetailsById(OkHttpClientPool.get300HttpClient(), id);
+  }
+
+  public Response pageTeacherBySchoolId(OkHttpClient client, Long schoolId, Integer cursorInt, Integer count) throws IOException {
     String query = FileUtil.readURLAsString(ResourceUtil.getResource("TeacherSearchPaginationQueryBySchool.txt")).toString();
 
     String base64SchoolId = Base64Utils.encodeToString("School-" + schoolId);
@@ -147,7 +156,6 @@ public class RMPGraphqlClient {
 
     String payload = FastJson2Utils.toJson(payloadMap);
 
-
     MediaType mediaType = MediaType.parse("application/json");
     @SuppressWarnings("deprecation")
     RequestBody body = RequestBody.create(mediaType, payload);
@@ -158,11 +166,20 @@ public class RMPGraphqlClient {
         .addHeader("Authorization", authorization).addHeader("User-Agent", userAgent)
         //
         .addHeader("Content-Type", "application/json").build();
-    return MyHttpClient.httpClient.newCall(request).execute();
+    return client.newCall(request).execute();
+  }
 
+  public Response pageTeacherBySchoolId(Long schoolId, Integer cursorInt, Integer count) throws IOException {
+    OkHttpClient client = OkHttpClientPool.get300HttpClient();
+    return pageTeacherBySchoolId(client, schoolId, cursorInt, count);
   }
 
   public Integer countTeacherBySchool(Long schoolId) throws IOException {
+    OkHttpClient okHttpClient = OkHttpClientPool.get300HttpClient();
+    return countTeacherBySchool(okHttpClient, schoolId);
+  }
+
+  public Integer countTeacherBySchool(OkHttpClient okHttpClient, Long schoolId) throws IOException {
     String query = FileUtil.readURLAsString(ResourceUtil.getResource("CounTeacherBySchool.txt")).toString();
 
     String base64SchoolId = Base64Utils.encodeToString("School-" + schoolId);
@@ -183,7 +200,6 @@ public class RMPGraphqlClient {
 
     String payload = FastJson2Utils.toJson(payloadMap);
 
-
     MediaType mediaType = MediaType.parse("application/json");
     @SuppressWarnings("deprecation")
     RequestBody body = RequestBody.create(mediaType, payload);
@@ -194,7 +210,7 @@ public class RMPGraphqlClient {
         .addHeader("Authorization", authorization).addHeader("User-Agent", userAgent)
         //
         .addHeader("Content-Type", "application/json").build();
-    try (Response response = MyHttpClient.httpClient.newCall(request).execute()) {
+    try (Response response = okHttpClient.newCall(request).execute()) {
       String string = response.body().string();
       JSONObject jsonObject = FastJson2Utils.parseObject(string);
       return jsonObject.getJSONObject("data").getJSONObject("search").getJSONObject("teachers").getInteger("resultCount");

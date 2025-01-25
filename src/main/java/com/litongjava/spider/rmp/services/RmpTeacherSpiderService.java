@@ -24,7 +24,7 @@ public class RmpTeacherSpiderService {
   public void spiderAllTeacher() {
     RMPGraphqlClient rmpGraphqlClient = Aop.get(RMPGraphqlClient.class);
     RmpProfessorService service = Aop.get(RmpProfessorService.class);
-    long i = 858242;
+    long i = 1213125;
     while (true) {
       i++;
       log.info("fetch:{}", i);
@@ -48,7 +48,6 @@ public class RmpTeacherSpiderService {
         String string = response.body().string();
         try {
           service.saveProfessorDetail(i, string);
-          log.info("save successful:{}", i);
         } catch (Exception e) {
           log.error("Failed to save:{}", i, e);
         }
