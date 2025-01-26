@@ -25,7 +25,7 @@ public class RmpTeacherSpiderService {
   public void spiderAllTeacher() {
     
     RmpProfessorService service = Aop.get(RmpProfessorService.class);
-    long i = 1213125;
+    long i = 0;
     while (true) {
       i++;
       log.info("fetch:{}", i);
