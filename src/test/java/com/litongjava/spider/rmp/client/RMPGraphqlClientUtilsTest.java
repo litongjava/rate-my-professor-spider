@@ -12,10 +12,9 @@ public class RMPGraphqlClientUtilsTest {
   @Test
   public void test() {
     EnvUtils.load();
-    try (Response response = RMPGraphqlClientUtils.getTeacherDetailsById(1217207L)) {
+    try (Response response = RMPGraphqlClientUtils.getTeacherDetailsById(2729642L)) {
       System.out.println(response.body().string());
     } catch (IOException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }

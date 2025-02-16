@@ -19,13 +19,13 @@ public class RMPGraphqlClientUtils {
   private static long expireTime = 0L;
 
   public static Response getTeacherDetailsById(long id) throws IOException {
-    OkHttpClient client = getProxyClient();
-    return rmpClient.getTeacherDetailsById(client, id);
+    //OkHttpClient client = getProxyClient();
+    return rmpClient.getTeacherDetailsById(MyHttpClient.httpClient, id);
   }
 
   public static Response getSchoolDetailsById(Long i) throws IOException {
-    OkHttpClient client = getProxyClient();
-    return rmpClient.getSchoolDetailsById(client, i);
+    //OkHttpClient client = getProxyClient();
+    return rmpClient.getSchoolDetailsById(MyHttpClient.httpClient, i);
   }
 
   private static synchronized OkHttpClient getProxyClient() throws IOException {

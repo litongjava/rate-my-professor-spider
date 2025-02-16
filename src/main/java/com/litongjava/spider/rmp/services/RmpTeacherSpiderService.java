@@ -23,11 +23,10 @@ public class RmpTeacherSpiderService {
   private AtomicInteger notFoundCount = new AtomicInteger(0);
 
   public void spiderAllTeacher() {
-    
+
     RmpProfessorService service = Aop.get(RmpProfessorService.class);
-    long i = 0;
-    while (true) {
-      i++;
+
+    for (long i = 2928065; i < 3500000; i++) {
       log.info("fetch:{}", i);
       if (Db.exists(TableNames.rumi_rmp_professor, "id", i)) {
         continue;

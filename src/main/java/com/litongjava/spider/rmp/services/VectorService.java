@@ -32,13 +32,13 @@ public class VectorService {
     String v = null;
     String md5 = Md5Utils.getMD5(text);
     String sql = String.format("select v from %s where md5=? and m=?", TableNames.rumi_embedding);
-    PGobject pGobject = Db.queryFirst(sql, md5, OpenAiModels.text_embedding_3_large);
+    PGobject pGobject = Db.queryFirst(sql, md5, OpenAiModels.TEXT_EMBEDDING_3_LARGE);
     if (pGobject != null) {
       v = pGobject.getValue();
     } else {
       float[] embeddingArray = null;
       synchronized (vectorLock) {
-        embeddingArray = OpenAiClient.embeddingArray(text, OpenAiModels.text_embedding_3_large);
+        embeddingArray = OpenAiClient.embeddingArray(text, OpenAiModels.TEXT_EMBEDDING_3_LARGE);
       }
 
       String string = Arrays.toString(embeddingArray);
@@ -47,7 +47,7 @@ public class VectorService {
       PGobject pgVector = PgVectorUtils.getPgVector(v);
       Row saveRecord = new Row().set("t", text).set("v", pgVector).set("id", id).set("md5", md5)
           //
-          .set("m", OpenAiModels.text_embedding_3_large);
+          .set("m", OpenAiModels.TEXT_EMBEDDING_3_LARGE);
       synchronized (writeLock) {
         Db.save("rumi_embedding", saveRecord);
       }

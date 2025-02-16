@@ -6,8 +6,8 @@ kill_timeout = 5
 processes = []
 
 [[vm]]
-  size = "shared-cpu-1x"
-  memory = "2048MB"
+  size = "performance-4x"
+  memory = "8192MB"
 
 [http_service]
   internal_port = 81
