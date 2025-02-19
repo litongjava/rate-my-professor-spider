@@ -10,10 +10,12 @@ import com.litongjava.db.activerecord.Db;
 import com.litongjava.jfinal.aop.Aop;
 import com.litongjava.spider.rmp.constants.TableNames;
 import com.litongjava.spider.rmp.model.RumiRmpSchoolRating;
-import com.litongjava.spider.rmp.model.base.BaseRumiRmpSchoolRatingThumb;
 import com.litongjava.tio.utils.date.DateParseUtils;
 import com.litongjava.tio.utils.encoder.Base64Utils;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class RmpSchooRatingService {
 
   public void save(Long schoolId, com.alibaba.fastjson2.JSONArray jsonArray) {
@@ -28,7 +30,7 @@ public class RmpSchooRatingService {
       if (userThumbs != null && userThumbs.size() > 0) {
         userThumbsList.add(userThumbs);
       }
-      
+
       String idString = jsonObject.getString("id");
       String dateString = jsonObject.getString("date");
       Date date = Date.from(DateParseUtils.parseUTCDateString(dateString).toInstant());
@@ -47,8 +49,14 @@ public class RmpSchooRatingService {
     Db.tx(() -> {
       String sql = "delete from %s where school_id=?";
       sql = String.format(sql, TableNames.rumi_rmp_school_rating);
-      Db.delete(sql, schoolId);
-      Db.batchSave(list, 100);
+
+      try {
+        Db.delete(sql, schoolId);
+        Db.batchSave(list, 100);
+      } catch (Exception e) {
+        log.error(e.getMessage(), e);
+      }
+
       return true;
     });
 

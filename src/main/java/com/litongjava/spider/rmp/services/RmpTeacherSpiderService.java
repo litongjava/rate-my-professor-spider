@@ -26,7 +26,7 @@ public class RmpTeacherSpiderService {
 
     RmpProfessorService service = Aop.get(RmpProfessorService.class);
 
-    for (long i = 2928065; i < 3500000; i++) {
+    for (long i = 1; i < 3500000; i++) {
       log.info("fetch:{}", i);
       if (Db.exists(TableNames.rumi_rmp_professor, "id", i)) {
         continue;
